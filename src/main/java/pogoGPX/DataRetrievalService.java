@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,7 +39,7 @@ public class DataRetrievalService {
 		super();
 	}
 	
-	public String quests(String pokedexNumber) throws IOException {
+	public List<Coordinates> quests(String pokedexNumber) throws IOException {
 		String url = questURI + pokedexNumber;
     	StringBuilder content;
     	try {
@@ -64,6 +69,25 @@ public class DataRetrievalService {
             con.disconnect();
         }
     	
-    	return content.toString();
+    	return parseRawData(content.toString());
+	}
+	
+	/**
+	 * Parses raw data into a list of Coordinates Objects.
+	 * @return list of Coordinates objects.
+	 */
+	private List<Coordinates> parseRawData(String incomingJSON) {
+		
+		JSONObject jo = new JSONObject(incomingJSON);
+		//"quests" works for now, but if I add anything else, I'll have to make it variable
+		JSONArray quests = jo.getJSONArray("quests");
+		
+		List<Coordinates> coordsArray = new ArrayList<>();
+		for (int i = 0; i < quests.length(); i++) {
+			JSONObject currObj = quests.getJSONObject(i);
+			coordsArray.add(new Coordinates(currObj.getString("lat"), currObj.getString("lng")));
+		}
+
+		return coordsArray;
 	}
 }

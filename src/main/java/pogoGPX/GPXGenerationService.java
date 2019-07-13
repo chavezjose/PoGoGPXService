@@ -1,11 +1,7 @@
 package pogoGPX;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jenetics.jpx.GPX;
@@ -13,9 +9,6 @@ import io.jenetics.jpx.WayPoint;
 
 @Component
 public class GPXGenerationService {
-
-	@Autowired
-	private DataRetrievalService dataService;
 	
 	@Value("${file.path}")
 	private String filePath;
@@ -32,10 +25,8 @@ public class GPXGenerationService {
 	 * @return The name of the create file.
 	 * @throws filename IOException
 	 */
-	public String generateGPXQuest(String pokedexNumber) throws IOException {
-		// A list of coordinates
-		List<Coordinates> coordsArray = parseRawData(dataService.quests(pokedexNumber));
-		
+	public String generateGPXQuest(List<Coordinates> coordsArray) throws IOException {
+
 		GPX.Builder builder = GPX.builder();
 		
 		for (int i = 0; i < coordsArray.size(); i++) {
@@ -50,24 +41,5 @@ public class GPXGenerationService {
 		GPX.write(gpx, filePath + filename);
 		
 		return filename;
-	}
-	
-	/**
-	 * Parses raw data into a list of Coordinates Objects.
-	 * @return list of Coordinates objects.
-	 */
-	private List<Coordinates> parseRawData(String incomingJSON) {
-		
-		JSONObject jo = new JSONObject(incomingJSON);
-		//"quests" works for now, but if I add anything else, I'll have to make it variable
-		JSONArray quests = jo.getJSONArray("quests");
-		
-		List<Coordinates> coordsArray = new ArrayList<>();
-		for (int i = 0; i < quests.length(); i++) {
-			JSONObject currObj = quests.getJSONObject(i);
-			coordsArray.add(new Coordinates(currObj.getString("lat"), currObj.getString("lng")));
-		}
-
-		return coordsArray;
 	}
 }

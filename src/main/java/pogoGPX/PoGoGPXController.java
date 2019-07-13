@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +26,9 @@ public class PoGoGPXController {
 
 	@Autowired
     private GPXGenerationService gpxGenerationService;
+	
+	@Autowired
+	private DataRetrievalService dataService;
     
 	@Value("${file.path}")
 	private String filePath;
@@ -37,14 +41,28 @@ public class PoGoGPXController {
     	response.sendRedirect(homepage);
     }
     
+    @RequestMapping("/txt/quests/{pokedexNumber}/")
+    public String questTxt(@PathVariable String pokedexNumber) throws IOException {
+    	
+    	String response = "";
+    	List<Coordinates> coordsArray = dataService.quests(pokedexNumber);
+    	for (Coordinates coords: coordsArray) {
+    		response += coords.toString();
+    	}
+    	
+    	return response;
+    	
+    }
+    
     @RequestMapping(
     	method = RequestMethod.GET,
     	value = "/gpx/quests/{pokedexNumber}/",
     	produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public @ResponseBody Object quests(@PathVariable String pokedexNumber) throws IOException {
-    	    	
-    	String filename = gpxGenerationService.generateGPXQuest(pokedexNumber);
+    public @ResponseBody Object questsGPX(@PathVariable String pokedexNumber) throws IOException {
+   
+    	String filename = gpxGenerationService.generateGPXQuest(dataService.quests(pokedexNumber));
+ 
     	return returnFile(filename);
 
     }
