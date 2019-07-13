@@ -44,8 +44,8 @@ public class PoGoGPXController {
     @RequestMapping("/txt/quests/{pokedexNumber}/")
     public String questTxt(@PathVariable String pokedexNumber) throws IOException {
     	
-    	String response = "";
     	List<Coordinates> coordsArray = dataService.quests(pokedexNumber);
+    	String response = "Found " + coordsArray.size() + " Pokestops for Pokemon #" + pokedexNumber + ":\n\n";
     	for (Coordinates coords: coordsArray) {
     		response += coords.toString();
     	}
