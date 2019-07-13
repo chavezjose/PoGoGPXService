@@ -3,16 +3,29 @@ package pogoGPX;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import io.jenetics.jpx.GPX;
 import io.jenetics.jpx.WayPoint;
 
+@Component
 public class GPXGenerationService {
 
-	private static DataRetrievalService dataService = new DataRetrievalService();
+	@Autowired
+	private DataRetrievalService dataService;
+	
+	@Value("${file.path}")
+	private String filePath;
+	
+	/**
+	 * Constructor.
+	 */
+	public GPXGenerationService() {
+		super();
+	}
 	
 	/**
 	 * This method is generate and save a GPX file.
@@ -34,7 +47,7 @@ public class GPXGenerationService {
 		
 		// Write file to system.
 		String filename = "" + (System.currentTimeMillis() / 1000L);
-		GPX.write(gpx, "C:\\gpxFiles\\" + filename);
+		GPX.write(gpx, filePath + filename);
 		
 		return filename;
 	}

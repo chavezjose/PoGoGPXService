@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,24 +21,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PoGoGPXController {
 
-    private GPXGenerationService gpxGenerationService = new GPXGenerationService();
+	@Autowired
+    private GPXGenerationService gpxGenerationService;
     
+	@Value("${file.path}")
+	private String filePath;
+	
     @RequestMapping("/test")
     public String greeting() {
         return "Hello World!";
     }
     
     @RequestMapping(
-    		method = RequestMethod.GET,
-    		value = "/gpx/quests/{pokedexNumber}/",
-    		produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    	method = RequestMethod.GET,
+    	value = "/gpx/quests/{pokedexNumber}/",
+    	produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
     public @ResponseBody Object quests(@PathVariable String pokedexNumber) throws IOException {
-    	
+    	    	
     	String filename = gpxGenerationService.generateGPXQuest(pokedexNumber);
     	return returnFile(filename);
-    	    	
-    	
+
     }
     
     /** Returns the generate GPX File.
@@ -44,8 +49,8 @@ public class PoGoGPXController {
      * @returns response object that is a GPX file.
      */
     public Object returnFile(String filename) throws IOException {
-    	
-    	File file2Upload = new File("C:\\gpxFiles\\" + filename);
+    	    	
+    	File file2Upload = new File(filePath + filename);
     	Path path = Paths.get(file2Upload.getAbsolutePath());
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 

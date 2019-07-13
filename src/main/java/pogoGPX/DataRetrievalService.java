@@ -5,9 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DataRetrievalService {
 
+	@Autowired
 	private static HttpURLConnection con;
 	
 	/**
@@ -16,8 +21,18 @@ public class DataRetrievalService {
 	 * @throws IOException
 	 */
 	 
-	private String questURI = "QUEST_URI";
-	private String cookie = "COOKIE";
+	@Value("${quest.uri}")
+	private String questURI;
+	
+	@Value("${cookie}")
+	private String cookie;
+	
+	/**
+	 * Constructor.
+	 */
+	public DataRetrievalService() {
+		super();
+	}
 	
 	public String quests(String pokedexNumber) throws IOException {
 		String url = questURI + pokedexNumber;
