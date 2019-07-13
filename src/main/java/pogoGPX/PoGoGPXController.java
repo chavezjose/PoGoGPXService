@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -27,9 +29,12 @@ public class PoGoGPXController {
 	@Value("${file.path}")
 	private String filePath;
 	
-    @RequestMapping("/test")
-    public String greeting() {
-        return "Hello World!";
+	@Value("${homepage}")
+	private String homepage;
+    
+    @RequestMapping("/")
+    public void homePage(HttpServletResponse response) throws IOException {
+    	response.sendRedirect(homepage);
     }
     
     @RequestMapping(
